@@ -298,7 +298,7 @@ export default function AdminOrders() {
               <p className="text-sm font-medium text-slate-600">Total Revenue</p>
               <BarChart3 className="w-5 h-5 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">£{totalRevenue.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-slate-900">£{totalRevenue.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -306,7 +306,7 @@ export default function AdminOrders() {
               <p className="text-sm font-medium text-slate-600">Total Weight</p>
               <Package className="w-5 h-5 text-purple-600" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">{totalWeight.toFixed(1)} kg</p>
+            <p className="text-2xl font-bold text-slate-900">{totalWeight.toLocaleString('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
