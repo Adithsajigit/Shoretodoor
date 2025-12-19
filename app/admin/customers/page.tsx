@@ -238,7 +238,8 @@ export default function CustomersPage() {
         address: '',
         city: '',
         state: 'Kerala',
-        pincode: ''
+        pincode: '',
+        pricingPackageId: ''
       });
     } catch (error) {
       console.error('Error adding customer:', error);

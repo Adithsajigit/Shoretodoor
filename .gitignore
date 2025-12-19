@@ -60,6 +60,10 @@ test-invoice.pdf
 test-*.ts
 test-*.js
 
+# Old/deprecated files
+*_OLD.*
+scripts/migrateProducts.ts
+
 # Firebase
 .firebase
 firebase-debug.log
