@@ -33,6 +33,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const { summary, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [orderTotal, setOrderTotal] = useState(0);
   const [remarks, setRemarks] = useState('');
   const [formData, setFormData] = useState<CustomerDetails>({
     name: customerData?.name || '',
@@ -72,6 +73,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setLoading(true);
 
     try {
+      // Save the order total before clearing cart
+      const currentTotal = summary.subtotal;
+      
       const result = await submitOrder({
         summary,
         customer: formData,
@@ -80,6 +84,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       });
       
       if (result.success) {
+        setOrderTotal(currentTotal);
         setSuccess(true);
         setTimeout(() => clearCart(), 500);
       }
@@ -103,7 +108,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <h2 className="font-display text-4xl font-bold text-slate-900 mb-3">Order Placed Successfully! 🎉</h2>
                 <p className="text-slate-600 mb-2 text-lg">Thank you for your order!</p>
                 <p className="text-sm text-slate-500 mb-8">
-                    Order Total: <span className="font-bold text-slate-900">{new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(summary.subtotal)}</span>
+                    Order Total: <span className="font-bold text-slate-900">{new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(orderTotal)}</span>
                 </p>
                 <div className="bg-slate-50 rounded-2xl p-4 mb-6 border border-slate-200">
                     <p className="text-xs text-slate-500 uppercase font-bold mb-2">What's Next?</p>
