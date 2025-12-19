@@ -51,9 +51,9 @@ export default function AdminSidebar({ user, onLogout }: AdminSidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
+    <aside className="w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl sticky top-0 h-screen overflow-hidden">
       {/* Logo Section */}
-      <div className="p-6 border-b border-slate-700">
+      <div className="p-6 border-b border-slate-700 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-ocean-400 to-seafoam-400 flex items-center justify-center shadow-lg shadow-ocean-500/50">
             <Fish className="w-6 h-6 text-white" strokeWidth={2.5} />
@@ -65,31 +65,34 @@ export default function AdminSidebar({ user, onLogout }: AdminSidebarProps) {
         </div>
       </div>
 
-      {/* Navigation Menu */}
-      <nav className="p-4 space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.path;
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800/50 hover:scrollbar-thumb-slate-600">
+        {/* Navigation Menu */}
+        <nav className="p-4 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path;
 
-          return (
-            <button
-              key={item.path}
-              onClick={() => router.push(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                isActive
-                  ? 'bg-gradient-to-r from-ocean-500 to-seafoam-500 text-white shadow-lg shadow-ocean-500/30'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="font-semibold">{item.name}</span>
-            </button>
-          );
-        })}
-      </nav>
+            return (
+              <button
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-ocean-500 to-seafoam-500 text-white shadow-lg shadow-ocean-500/30'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="font-semibold">{item.name}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
 
-      {/* User Profile Section - Right after navigation */}
-      <div className="p-4 border-t border-slate-700">
+      {/* User Profile Section - Sticky at bottom */}
+      <div className="p-4 border-t border-slate-700 flex-shrink-0 bg-slate-900">
         <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl mb-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ocean-400 to-seafoam-400 flex items-center justify-center font-bold text-white">
             {user?.email?.[0].toUpperCase()}
