@@ -209,31 +209,31 @@ export default function ProductsPage() {
     <div className="min-h-screen bg-slate-50 flex">
       <AdminSidebar user={user} onLogout={handleLogout} />
       
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
-              <Fish className="w-6 h-6 text-white" />
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
+              <Fish className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Products Management</h1>
-              <p className="text-slate-600">Manage fish products, prices, and inventory</p>
+              <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Products Management</h1>
+              <p className="text-xs sm:text-base text-slate-600 hidden sm:block">Manage fish products, prices, and inventory</p>
             </div>
           </div>
         </div>
         {/* Search and Add Button */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by name, code, or Malayalam name..."
+                placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <button
@@ -242,9 +242,9 @@ export default function ProductsPage() {
                 setEditingId(null);
                 resetForm();
               }}
-              className="px-6 py-2.5 bg-ocean-500 text-white rounded-lg hover:bg-ocean-600 transition-all flex items-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-ocean-500 text-white text-sm sm:text-base rounded-lg hover:bg-ocean-600 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               Add New Product
             </button>
           </div>

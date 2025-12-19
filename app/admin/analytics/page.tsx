@@ -398,29 +398,29 @@ export default function AnalyticsPage() {
     <div className="min-h-screen bg-slate-50 flex">
       <AdminSidebar user={user} onLogout={handleLogout} />
       
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-4 sm:p-6 overflow-auto">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <TrendingUp className="w-6 h-6 text-white" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-900">Analytics Dashboard</h1>
-                  <p className="text-slate-600">Comprehensive business insights and metrics</p>
+                  <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Analytics Dashboard</h1>
+                  <p className="text-xs sm:text-base text-slate-600">Comprehensive business insights and metrics</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 overflow-x-auto">
                 {/* Time Range Selector */}
-                <div className="flex gap-2 bg-white rounded-xl p-1 shadow-sm">
+                <div className="flex gap-1 sm:gap-2 bg-white rounded-xl p-1 shadow-sm">
                   {(['7d', '30d', '90d', 'all'] as const).map((range) => (
                     <button
                       key={range}
                       onClick={() => setTimeRange(range)}
-                      className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all whitespace-nowrap ${
                         timeRange === range
                           ? 'bg-blue-600 text-white shadow-md'
                           : 'text-slate-600 hover:bg-slate-100'
@@ -601,49 +601,49 @@ export default function AnalyticsPage() {
               </div>
 
               {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-ocean-500 rounded-2xl p-6 text-white shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <DollarSign className="w-8 h-8 opacity-80" />
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5" />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                <div className="bg-ocean-500 rounded-2xl p-4 sm:p-6 text-white shadow-xl">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 opacity-80" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                   </div>
-                  <h3 className="text-sm font-semibold opacity-90 mb-1">Total Revenue</h3>
-                  <p className="text-3xl font-bold">{formatCurrency(analytics.totalRevenue)}</p>
+                  <h3 className="text-xs sm:text-sm font-semibold opacity-90 mb-1">Total Revenue</h3>
+                  <p className="text-xl sm:text-3xl font-bold">{formatCurrency(analytics.totalRevenue)}</p>
                 </div>
 
-                <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <ShoppingCart className="w-8 h-8 opacity-80" />
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <Package className="w-5 h-5" />
+                <div className="bg-blue-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 opacity-80" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Package className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                   </div>
-                  <h3 className="text-sm font-semibold opacity-90 mb-1">Total Orders</h3>
-                  <p className="text-3xl font-bold">{formatNumber(analytics.totalOrders)}</p>
+                  <h3 className="text-xs sm:text-sm font-semibold opacity-90 mb-1">Total Orders</h3>
+                  <p className="text-xl sm:text-3xl font-bold">{formatNumber(analytics.totalOrders)}</p>
                 </div>
 
-                <div className="bg-violet-600 rounded-2xl p-6 text-white shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <Users className="w-8 h-8 opacity-80" />
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <Award className="w-5 h-5" />
+                <div className="bg-violet-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <Users className="w-6 h-6 sm:w-8 sm:h-8 opacity-80" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                   </div>
-                  <h3 className="text-sm font-semibold opacity-90 mb-1">Active Customers</h3>
-                  <p className="text-3xl font-bold">{formatNumber(analytics.totalCustomers)}</p>
+                  <h3 className="text-xs sm:text-sm font-semibold opacity-90 mb-1">Active Customers</h3>
+                  <p className="text-xl sm:text-3xl font-bold">{formatNumber(analytics.totalCustomers)}</p>
                 </div>
 
-                <div className="bg-emerald-600 rounded-2xl p-6 text-white shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <Calendar className="w-8 h-8 opacity-80" />
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <Percent className="w-5 h-5" />
+                <div className="bg-emerald-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <Calendar className="w-6 h-6 sm:w-8 sm:h-8 opacity-80" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                   </div>
-                  <h3 className="text-sm font-semibold opacity-90 mb-1">Avg. Order Value</h3>
-                  <p className="text-3xl font-bold">{formatCurrency(analytics.averageOrderValue)}</p>
+                  <h3 className="text-xs sm:text-sm font-semibold opacity-90 mb-1">Avg. Order Value</h3>
+                  <p className="text-xl sm:text-3xl font-bold">{formatCurrency(analytics.averageOrderValue)}</p>
                 </div>
               </div>
 

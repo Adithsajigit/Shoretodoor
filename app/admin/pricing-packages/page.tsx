@@ -398,32 +398,32 @@ export default function PricingPackagesPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-slate-100 flex">
       <AdminSidebar user={user} onLogout={handleLogout} />
       
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-4 sm:p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Package className="w-6 h-6 text-white" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-900">Pricing Packages</h1>
-                  <p className="text-slate-600">Create and manage different price lists for customers</p>
+                  <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Pricing Packages</h1>
+                  <p className="text-xs sm:text-base text-slate-600 hidden sm:block">Create and manage different price lists for customers</p>
                 </div>
               </div>
 
               {!loading && (
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                   {packages.length === 0 && (
                     <button
                       onClick={createDefaultPackage}
                       disabled={creatingDefault}
-                      className="px-6 py-3 bg-ocean-500 text-white rounded-xl hover:bg-ocean-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-ocean-500 text-white rounded-xl hover:bg-ocean-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {creatingDefault ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                           Creating...
                         </>
                       ) : (

@@ -265,16 +265,16 @@ export default function AdminOrders() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
-                <ShoppingCart className="w-5 h-5 text-white" strokeWidth={2.5} />
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-ocean-500 rounded-xl flex items-center justify-center shadow-lg">
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-ocean-600">
+                <h1 className="text-base sm:text-xl font-bold text-ocean-600">
                   Orders Management
                 </h1>
-                <p className="text-xs text-slate-500">View and manage all orders</p>
+                <p className="text-xs text-slate-500 hidden sm:block">View and manage all orders</p>
               </div>
             </div>
           </div>
@@ -282,65 +282,65 @@ export default function AdminOrders() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-slate-600">Total Orders</p>
-              <ShoppingCart className="w-5 h-5 text-blue-600" />
+              <p className="text-xs sm:text-sm font-medium text-slate-600">Total Orders</p>
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">{filteredOrders.length}</p>
+            <p className="text-xl sm:text-3xl font-bold text-slate-900">{filteredOrders.length}</p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-slate-600">Total Revenue</p>
-              <BarChart3 className="w-5 h-5 text-green-600" />
+              <p className="text-xs sm:text-sm font-medium text-slate-600">Total Revenue</p>
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">£{totalRevenue.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-lg sm:text-2xl font-bold text-slate-900">£{totalRevenue.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-slate-600">Total Weight</p>
-              <Package className="w-5 h-5 text-purple-600" />
+              <p className="text-xs sm:text-sm font-medium text-slate-600">Total Weight</p>
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{totalWeight.toLocaleString('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg</p>
+            <p className="text-lg sm:text-2xl font-bold text-slate-900">{totalWeight.toLocaleString('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg</p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-slate-600">Pending Orders</p>
-              <Clock className="w-5 h-5 text-yellow-600" />
+              <p className="text-xs sm:text-sm font-medium text-slate-600">Pending Orders</p>
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">
+            <p className="text-xl sm:text-3xl font-bold text-slate-900">
               {orders.filter(o => o.status === 'pending').length}
             </p>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search by customer name, email, phone, company, or order ID..."
+                  placeholder="Search orders..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
