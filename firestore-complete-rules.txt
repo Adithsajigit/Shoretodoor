@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email in ['ashifamsc@gmail.com', 'ashifamsas@gmail.com'];
+    }
+    
+    // Customers collection
+    match /customers/{customerId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;  // Temporarily allow all authenticated users
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow write: if true;
+    }
+    
+    // Order Links collection
+    match /orderLinks/{linkId} {
+      allow read: if true;
+      allow write: if request.auth != null;  // Temporarily allow all authenticated users
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;  // Temporarily allow all authenticated users
+    }
+    
+    // Pricing Packages collection - NEW
+    match /pricingPackages/{packageId} {
+      allow read: if true;
+      allow write: if request.auth != null;  // Temporarily allow all authenticated users
+    }
+    
+    // Package Prices collection - NEW
+    match /packagePrices/{priceId} {
+      allow read: if true;
+      allow write: if request.auth != null;  // Temporarily allow all authenticated users
+    }
+  }
+}
