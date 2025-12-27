@@ -3,6 +3,8 @@ import { OrderSummary, CustomerDetails } from '../../../types';
 import { collection, addDoc, Timestamp, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { markLinkAsUsed } from '../../../lib/orderLinks';
+import { sendOrderConfirmationEmail } from '../../../lib/emailService';
+import { sendOrderInvoiceTemplate } from '../../../lib/whatsappService';
 
 export async function POST(request: Request) {
   try {
@@ -66,49 +68,74 @@ export async function POST(request: Request) {
     }
 
     // Send order confirmation email to customer
+    let invoiceUrl = '';
+    let whatsappSent = false;
+    
     try {
-      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/send-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerName: customer.name,
-          customerEmail: customer.email,
-          customerPhone: customer.phone,
-          orderId: orderDoc.id,
-          orderDocId: orderDoc.id,
-          orderTotal: summary.subtotal,
-          totalWeight: summary.totalWeight,
-          tier: summary.tier,
-          items: summary.items.map(item => ({
-            productName: item.product.englishName,
-            malayalamName: item.product.malayalamName,
-            quantity: item.quantity,
-            price: item.price,
-            lineTotal: item.lineTotal
-          }))
-        }),
+      console.log('Sending order confirmation email...');
+      const emailResult = await sendOrderConfirmationEmail({
+        customerName: customer.name,
+        customerEmail: customer.email,
+        orderId: orderDoc.id,
+        orderTotal: summary.subtotal,
+        totalWeight: summary.totalWeight,
+        tier: summary.tier,
+        items: summary.items.map(item => ({
+          productName: item.product.englishName,
+          malayalamName: item.product.malayalamName || '',
+          quantity: item.quantity,
+          price: item.price,
+          lineTotal: item.lineTotal
+        }))
       });
-      
-      const emailResult = await emailResponse.json().catch(() => ({ success: false }));
 
-      if (emailResponse.ok && emailResult?.invoiceUrl) {
+      if (emailResult.success && emailResult.invoiceUrl) {
+        invoiceUrl = emailResult.invoiceUrl;
+        console.log('Email sent successfully, invoice URL:', invoiceUrl);
+        
+        // Update order document with invoice URL
         try {
           await updateDoc(doc(db, 'orders', orderDoc.id), {
-            invoiceUrl: emailResult.invoiceUrl,
+            invoiceUrl: invoiceUrl,
             invoiceGeneratedAt: Timestamp.now()
           });
           console.log('Invoice URL saved to order document');
-          
-          if (emailResult.whatsappSent) {
-            console.log('WhatsApp message sent successfully');
-          }
         } catch (updateError) {
           console.warn('Failed to save invoice URL:', updateError);
         }
+
+        // Send WhatsApp message if phone number is provided
+        if (customer.phone) {
+          try {
+            console.log('Sending WhatsApp message...');
+            const whatsappResult = await sendOrderInvoiceTemplate({
+              customerName: customer.name,
+              customerPhone: customer.phone,
+              orderId: orderDoc.id,
+              orderTotal: summary.subtotal,
+              totalWeight: summary.totalWeight,
+              tier: summary.tier,
+              invoiceUrl: invoiceUrl,
+              items: summary.items.map(item => ({
+                productName: item.product.englishName,
+                malayalamName: item.product.malayalamName || '',
+                quantity: item.quantity,
+                price: item.price,
+                lineTotal: item.lineTotal
+              }))
+            });
+
+            if (whatsappResult.success) {
+              whatsappSent = true;
+              console.log('WhatsApp message sent successfully');
+            } else {
+              console.warn('WhatsApp sending failed:', whatsappResult.error);
+            }
+          } catch (whatsappError) {
+            console.error('WhatsApp error (continuing):', whatsappError);
+          }
+        }
       }
-      console.log('Order confirmation email request sent');
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
       // Don't fail the order if email fails
@@ -117,6 +144,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ 
       success: true, 
       orderId: orderDoc.id,
+      invoiceUrl: invoiceUrl,
+      whatsappSent: whatsappSent,
       message: 'Order processed successfully' 
     });
 
