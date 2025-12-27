@@ -214,7 +214,7 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
     // Send the approved template with order details
     const templateResult = await sendWhatsAppTemplate({
       to: data.customerPhone,
-      templateName: 'order_invoice_notification', // This will be the approved template name
+      templateName: 'purchase_receipt_1', // Approved Meta template name
       languageCode: 'en_US',
       parameters: [
         { type: 'text', text: data.customerName },           // {{1}} Customer Name
