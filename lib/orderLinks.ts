@@ -91,38 +91,61 @@ export async function validateOrderLink(token: string): Promise<{
   error?: string;
 }> {
   try {
+    console.log('[validateOrderLink] Starting validation for token:', token);
+    
+    if (!token || token.trim() === '') {
+      console.error('[validateOrderLink] Empty token provided');
+      return { valid: false, error: 'No token provided' };
+    }
+
     const linksRef = collection(db, 'orderLinks');
     const q = query(linksRef, where('token', '==', token));
+    
+    console.log('[validateOrderLink] Querying Firestore...');
     const querySnapshot = await getDocs(q);
+    console.log('[validateOrderLink] Query result:', querySnapshot.empty ? 'empty' : `${querySnapshot.size} docs`);
 
     if (querySnapshot.empty) {
+      console.error('[validateOrderLink] No matching link found');
       return { valid: false, error: 'Invalid link' };
     }
 
     const linkDoc = querySnapshot.docs[0];
     const linkData = linkDoc.data();
+    console.log('[validateOrderLink] Link data retrieved:', { 
+      customerId: linkData.customerId, 
+      isActive: linkData.isActive, 
+      isUsed: linkData.isUsed 
+    });
 
     // Check if link is active
     if (!linkData.isActive) {
+      console.error('[validateOrderLink] Link is not active');
       return { valid: false, error: 'This link has been deactivated' };
     }
 
     // Check if link has expired
     const now = new Date();
     const expiresAt = linkData.expiresAt.toDate();
+    console.log('[validateOrderLink] Expiry check:', { now, expiresAt, expired: now > expiresAt });
+    
     if (now > expiresAt) {
+      console.error('[validateOrderLink] Link has expired');
       return { valid: false, error: 'This link has expired' };
     }
 
     // Check if link has been used
     if (linkData.isUsed) {
+      console.error('[validateOrderLink] Link has already been used');
       return { valid: false, error: 'This link has already been used' };
     }
 
     // Get full customer details from customers collection
+    console.log('[validateOrderLink] Fetching customer details...');
     const customerDoc = await getDoc(doc(db, 'customers', linkData.customerId));
     
     if (!customerDoc.exists()) {
+      console.warn('[validateOrderLink] Customer document not found, using link data');
       return { 
         valid: true,
         customerId: linkData.customerId,
@@ -133,6 +156,7 @@ export async function validateOrderLink(token: string): Promise<{
     }
 
     const customerData = customerDoc.data();
+    console.log('[validateOrderLink] Customer data retrieved successfully');
 
     return {
       valid: true,
@@ -150,8 +174,9 @@ export async function validateOrderLink(token: string): Promise<{
       bronzeTierEnabled: linkData.bronzeTierEnabled || false
     };
   } catch (error) {
-    console.error('Error validating order link:', error);
-    return { valid: false, error: 'Failed to validate link' };
+    console.error('[validateOrderLink] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { valid: false, error: `Failed to validate link: ${errorMessage}` };
   }
 }
 

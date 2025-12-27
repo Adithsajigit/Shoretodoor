@@ -31,7 +31,9 @@ export default function OrderPage() {
   useEffect(() => {
     const checkLink = async () => {
       try {
+        console.log('Validating order link token:', token);
         const result = await validateOrderLink(token);
+        console.log('Validation result:', result);
         
         if (result.valid) {
           setValid(true);
@@ -49,10 +51,12 @@ export default function OrderPage() {
             bronzeTierEnabled: result.bronzeTierEnabled || false
           });
         } else {
+          console.error('Link validation failed:', result.error);
           setError(result.error || 'Invalid link');
         }
       } catch (err) {
-        setError('Failed to validate link');
+        console.error('Error validating link:', err);
+        setError(`Failed to validate link: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -60,6 +64,9 @@ export default function OrderPage() {
 
     if (token) {
       checkLink();
+    } else {
+      setError('No token provided');
+      setLoading(false);
     }
   }, [token]);
 
