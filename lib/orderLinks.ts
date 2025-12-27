@@ -43,7 +43,17 @@ export async function createOrderLink(
   customerEmail: string,
   durationMinutes: number,
   createdBy: string,
-  bronzeTierEnabled: boolean = false
+  bronzeTierEnabled: boolean = false,
+  customerData?: {
+    phone?: string;
+    company?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    pricingPackageId?: string;
+    pricingPackageName?: string;
+  }
 ): Promise<{ token: string; expiresAt: Date; linkUrl: string }> {
   const token = generateToken();
   const now = new Date();
@@ -59,7 +69,16 @@ export async function createOrderLink(
     createdBy,
     isUsed: false,
     isActive: true,
-    bronzeTierEnabled
+    bronzeTierEnabled,
+    // Store full customer data for fallback
+    customerPhone: customerData?.phone || '',
+    customerCompany: customerData?.company || '',
+    customerAddress: customerData?.address || '',
+    customerCity: customerData?.city || '',
+    customerState: customerData?.state || '',
+    customerPincode: customerData?.pincode || '',
+    pricingPackageId: customerData?.pricingPackageId || '',
+    pricingPackageName: customerData?.pricingPackageName || 'Default'
   };
 
   await addDoc(collection(db, 'orderLinks'), linkData);
@@ -142,35 +161,50 @@ export async function validateOrderLink(token: string): Promise<{
 
     // Get full customer details from customers collection
     console.log('[validateOrderLink] Fetching customer details...');
-    const customerDoc = await getDoc(doc(db, 'customers', linkData.customerId));
     
-    if (!customerDoc.exists()) {
-      console.warn('[validateOrderLink] Customer document not found, using link data');
-      return { 
-        valid: true,
-        customerId: linkData.customerId,
-        customerName: linkData.customerName,
-        customerEmail: linkData.customerEmail,
-        bronzeTierEnabled: linkData.bronzeTierEnabled || false
-      };
+    try {
+      const customerDoc = await getDoc(doc(db, 'customers', linkData.customerId));
+      
+      if (customerDoc.exists()) {
+        const customerData = customerDoc.data();
+        console.log('[validateOrderLink] Customer data retrieved successfully');
+
+        return {
+          valid: true,
+          customerId: linkData.customerId,
+          customerName: customerData.name,
+          customerEmail: customerData.email,
+          customerPhone: customerData.phone,
+          customerCompany: customerData.company,
+          customerAddress: customerData.address,
+          customerCity: customerData.city,
+          customerState: customerData.state,
+          customerPincode: customerData.pincode,
+          pricingPackageId: customerData.pricingPackageId || '',
+          pricingPackageName: customerData.pricingPackageName || 'Default',
+          bronzeTierEnabled: linkData.bronzeTierEnabled || false
+        };
+      }
+    } catch (customerError) {
+      // If we can't fetch customer details due to permissions, use link data
+      console.warn('[validateOrderLink] Could not fetch customer details (permissions), using link data:', customerError);
     }
-
-    const customerData = customerDoc.data();
-    console.log('[validateOrderLink] Customer data retrieved successfully');
-
-    return {
+    
+    // Fallback: Use data from orderLinks collection if customer fetch fails
+    console.log('[validateOrderLink] Using orderLink data as fallback');
+    return { 
       valid: true,
       customerId: linkData.customerId,
-      customerName: customerData.name,
-      customerEmail: customerData.email,
-      customerPhone: customerData.phone,
-      customerCompany: customerData.company,
-      customerAddress: customerData.address,
-      customerCity: customerData.city,
-      customerState: customerData.state,
-      customerPincode: customerData.pincode,
-      pricingPackageId: customerData.pricingPackageId || '',
-      pricingPackageName: customerData.pricingPackageName || 'Default',
+      customerName: linkData.customerName,
+      customerEmail: linkData.customerEmail,
+      customerPhone: linkData.customerPhone || '',
+      customerCompany: linkData.customerCompany || '',
+      customerAddress: linkData.customerAddress || '',
+      customerCity: linkData.customerCity || '',
+      customerState: linkData.customerState || '',
+      customerPincode: linkData.customerPincode || '',
+      pricingPackageId: linkData.pricingPackageId || '',
+      pricingPackageName: linkData.pricingPackageName || 'Default',
       bronzeTierEnabled: linkData.bronzeTierEnabled || false
     };
   } catch (error) {

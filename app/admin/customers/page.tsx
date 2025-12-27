@@ -291,7 +291,17 @@ export default function CustomersPage() {
         selectedCustomer.email,
         durationMinutes,
         user?.email || 'admin',
-        enableBronzeTier
+        enableBronzeTier,
+        {
+          phone: selectedCustomer.phone,
+          company: selectedCustomer.company,
+          address: selectedCustomer.address,
+          city: selectedCustomer.city,
+          state: selectedCustomer.state,
+          pincode: selectedCustomer.pincode,
+          pricingPackageId: selectedCustomer.pricingPackageId,
+          pricingPackageName: selectedCustomer.pricingPackageName
+        }
       );
 
       setGeneratedLink(result.linkUrl);
