@@ -136,11 +136,13 @@ export async function POST(request: Request) {
               whatsappSent = true;
               console.log('WhatsApp message sent successfully');
             } else {
-              console.warn('WhatsApp sending failed:', whatsappResult.error);
+              console.warn('WhatsApp sending failed:', whatsappResult);
             }
           } catch (whatsappError) {
             console.error('WhatsApp error (continuing):', whatsappError);
           }
+        } else {
+          console.log('No customer phone provided. Skipping WhatsApp send.');
         }
       }
     } catch (emailError: any) {

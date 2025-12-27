@@ -27,6 +27,9 @@ interface WhatsAppTemplateData {
   parameters?: Array<{ type: string; text: string }>;
 }
 
+const formatPhoneNumber = (phone: string) =>
+  phone.replace(/[^0-9]/g, '');
+
 export async function sendWhatsAppInvoice(data: WhatsAppMessageData) {
   try {
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -193,6 +196,8 @@ export async function sendWhatsAppTemplate(data: WhatsAppTemplateData) {
       ];
     }
 
+    console.log('[WhatsApp] Template payload:', JSON.stringify(messagePayload));
+
     const response = await axios.post(
       `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`,
       messagePayload,
@@ -204,9 +209,20 @@ export async function sendWhatsAppTemplate(data: WhatsAppTemplateData) {
       }
     );
 
+    console.log('[WhatsApp] Template send success:', response.data);
     return { success: true, data: response.data };
   } catch (error: any) {
-    console.error('WhatsApp template sending failed:', error.response?.data || error.message);
+    console.error('[WhatsApp] Template sending failed:', error.response?.data || error.message);
+    if (error.response?.data?.error) {
+      const err = error.response.data.error;
+      console.error('[WhatsApp] Error details:', {
+        code: err.code,
+        message: err.message,
+        type: err.type,
+        subcode: err.error_subcode,
+        fbtrace_id: err.fbtrace_id
+      });
+    }
     return { success: false, error: error.response?.data || error.message };
   }
 }
@@ -221,11 +237,22 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
       return { success: false, error: 'WhatsApp credentials missing' };
     }
 
-    console.log('Sending invoice template to:', data.customerPhone);
+    const formattedPhone = formatPhoneNumber(data.customerPhone);
+    console.log('[WhatsApp] Preparing template send');
+    console.log('[WhatsApp] Raw phone:', data.customerPhone);
+    console.log('[WhatsApp] Formatted phone:', formattedPhone);
+    console.log('[WhatsApp] Template: purchase_receipt_1');
+    console.log('[WhatsApp] Parameters:', {
+      name: data.customerName,
+      orderId: data.orderId,
+      total: data.orderTotal,
+      weight: data.totalWeight,
+      tier: data.tier
+    });
 
     // Send the approved template with order details
     const templateResult = await sendWhatsAppTemplate({
-      to: data.customerPhone,
+      to: formattedPhone,
       templateName: 'purchase_receipt_1', // Approved Meta template name
       languageCode: 'en_US',
       parameters: [
@@ -237,6 +264,7 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
       ]
     });
 
+    console.log('[WhatsApp] Template result:', templateResult);
     return templateResult;
 
   } catch (error: any) {
