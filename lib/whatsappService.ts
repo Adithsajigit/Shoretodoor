@@ -40,14 +40,26 @@ export async function sendWhatsAppInvoice(data: WhatsAppMessageData) {
     console.log('Sending WhatsApp to:', data.customerPhone);
 
     // Step 1: Upload the invoice PDF to WhatsApp
-    const invoiceFilePath = path.join(process.cwd(), 'public', data.invoiceUrl.replace(/^\//, ''));
+    // In production (Vercel), invoiceUrl is the actual file path in /tmp
+    // In local development, it's a public URL path
+    let invoiceFilePath: string;
+    
+    if (data.invoiceUrl.startsWith('/tmp/')) {
+      // Production: Direct file path
+      invoiceFilePath = data.invoiceUrl;
+    } else {
+      // Local development: Convert public URL to file path
+      invoiceFilePath = path.join(process.cwd(), 'public', data.invoiceUrl.replace(/^\//, ''));
+    }
+    
+    console.log('[WhatsApp] Invoice file path:', invoiceFilePath);
     
     if (!fs.existsSync(invoiceFilePath)) {
-      console.error('Invoice file not found:', invoiceFilePath);
+      console.error('[WhatsApp] Invoice file not found:', invoiceFilePath);
       return { success: false, error: 'Invoice file not found' };
     }
 
-    console.log('Uploading invoice from:', invoiceFilePath);
+    console.log('[WhatsApp] Uploading invoice from:', invoiceFilePath);
 
     // Upload media to WhatsApp
     const formData = new FormData();
@@ -67,7 +79,7 @@ export async function sendWhatsAppInvoice(data: WhatsAppMessageData) {
     );
 
     const mediaId = uploadResponse.data.id;
-    console.log('WhatsApp media uploaded, ID:', mediaId);
+    console.log('[WhatsApp] Media uploaded, ID:', mediaId);
 
     // Step 2: Send message with the invoice PDF
     // Using a simple text message first, then the document

@@ -23,9 +23,25 @@ interface InvoiceData {
 export async function saveInvoicePDF(data: InvoiceData): Promise<string> {
   const pdfBuffer = await generateInvoicePDF(data);
   
-  // Create invoices directory if it doesn't exist
-  const invoicesDir = path.join(process.cwd(), 'public', 'invoices');
+  // In serverless environments (like Vercel), use /tmp directory
+  // In local development, use public/invoices
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+  
+  let invoicesDir: string;
+  let publicUrl: string;
+  
+  if (isProduction) {
+    // Use /tmp in serverless environment
+    invoicesDir = path.join('/tmp', 'invoices');
+    console.log('[PDF] Using /tmp directory for invoice storage (serverless)');
+  } else {
+    // Use public/invoices in local development
+    invoicesDir = path.join(process.cwd(), 'public', 'invoices');
+    console.log('[PDF] Using public/invoices directory (local development)');
+  }
+  
   if (!fs.existsSync(invoicesDir)) {
+    console.log('[PDF] Creating invoices directory:', invoicesDir);
     fs.mkdirSync(invoicesDir, { recursive: true });
   }
   
@@ -33,11 +49,22 @@ export async function saveInvoicePDF(data: InvoiceData): Promise<string> {
   const filename = `Invoice_${data.orderId.slice(0, 8).toUpperCase()}_${Date.now()}.pdf`;
   const filePath = path.join(invoicesDir, filename);
   
+  console.log('[PDF] Saving invoice to:', filePath);
+  
   // Save to disk
   fs.writeFileSync(filePath, pdfBuffer);
   
-  // Return the public URL
-  return `/invoices/${filename}`;
+  console.log('[PDF] Invoice saved successfully');
+  
+  // Return the file path (for email attachment in serverless, or public URL in local)
+  if (isProduction) {
+    // In production, return the actual file path for email attachment
+    // The invoice will be attached to email, not served as public URL
+    return filePath;
+  } else {
+    // In local development, return the public URL
+    return `/invoices/${filename}`;
+  }
 }
 
 export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
