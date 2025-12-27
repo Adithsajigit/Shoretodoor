@@ -71,8 +71,15 @@ export async function POST(request: Request) {
     let invoiceUrl = '';
     let whatsappSent = false;
     
+    console.log('=== Starting Email & WhatsApp Process ===');
+    console.log('Customer Email:', customer.email);
+    console.log('Customer Phone:', customer.phone);
+    console.log('SMTP_USER configured:', !!process.env.SMTP_USER);
+    console.log('SMTP_PASS configured:', !!process.env.SMTP_PASS);
+    console.log('WHATSAPP_ACCESS_TOKEN configured:', !!process.env.WHATSAPP_ACCESS_TOKEN);
+    
     try {
-      console.log('Sending order confirmation email...');
+      console.log('Calling sendOrderConfirmationEmail...');
       const emailResult = await sendOrderConfirmationEmail({
         customerName: customer.name,
         customerEmail: customer.email,
@@ -136,10 +143,18 @@ export async function POST(request: Request) {
           }
         }
       }
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
+    } catch (emailError: any) {
+      console.error('=== EMAIL ERROR ===');
+      console.error('Error Type:', emailError.constructor.name);
+      console.error('Error Message:', emailError.message);
+      console.error('Error Stack:', emailError.stack);
+      console.error('Full Error:', JSON.stringify(emailError, null, 2));
       // Don't fail the order if email fails
     }
+
+    console.log('=== Email & WhatsApp Process Complete ===');
+    console.log('Invoice URL:', invoiceUrl || 'NOT GENERATED');
+    console.log('WhatsApp Sent:', whatsappSent);
 
     return NextResponse.json({ 
       success: true, 

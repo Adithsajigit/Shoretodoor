@@ -49,9 +49,21 @@ interface OrderEmailData {
 
 export async function sendOrderConfirmationEmail(data: OrderEmailData) {
   try {
+    console.log('[EmailService] Starting sendOrderConfirmationEmail');
+    console.log('[EmailService] Data received:', {
+      customerName: data.customerName,
+      customerEmail: data.customerEmail,
+      orderId: data.orderId,
+      orderTotal: data.orderTotal,
+      itemsCount: data.items.length
+    });
+
+    console.log('[EmailService] Getting transporter...');
     const transporter = getTransporter();
+    console.log('[EmailService] Transporter obtained');
     
     // Generate PDF invoice and save it
+    console.log('[EmailService] Saving invoice PDF...');
     const invoiceUrl = await saveInvoicePDF({
       orderId: data.orderId,
       customerName: data.customerName,
@@ -63,7 +75,10 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
       tier: data.tier
     });
     
+    console.log('[EmailService] Invoice PDF saved:', invoiceUrl);
+    
     // Generate PDF buffer for email attachment
+    console.log('[EmailService] Generating PDF buffer for attachment...');
     const pdfBuffer = await generateInvoicePDF({
       orderId: data.orderId,
       customerName: data.customerName,
@@ -74,6 +89,9 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
       subtotal: data.orderTotal,
       tier: data.tier
     });
+
+    console.log('[EmailService] PDF buffer generated, size:', pdfBuffer.length, 'bytes');
+    console.log('[EmailService] Building email HTML...');
 
     const itemsHtml = data.items.map(item => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -297,11 +315,20 @@ Shore to Door - Premium Kerala Fresh Fish Importer
       ]
     };
 
+    console.log('[EmailService] Sending email to:', data.customerEmail);
+    console.log('[EmailService] Email subject:', mailOptions.subject);
+    
     const info = await transporter.sendMail(mailOptions);
-    console.log('Order confirmation email sent:', info.messageId);
+    console.log('[EmailService] Email sent successfully! MessageId:', info.messageId);
+    console.log('[EmailService] Response:', info.response);
+    
     return { success: true, messageId: info.messageId, invoiceUrl };
-  } catch (error) {
-    console.error('Error sending order confirmation email:', error);
+  } catch (error: any) {
+    console.error('[EmailService] ERROR sending email:');
+    console.error('[EmailService] Error Type:', error.constructor?.name);
+    console.error('[EmailService] Error Message:', error.message);
+    console.error('[EmailService] Error Code:', error.code);
+    console.error('[EmailService] Error Stack:', error.stack);
     throw error;
   }
 }
