@@ -196,7 +196,7 @@ export async function sendWhatsAppTemplate(data: WhatsAppTemplateData) {
       ];
     }
 
-    console.log('[WhatsApp] Template payload:', JSON.stringify(messagePayload));
+  console.log('[WhatsApp] Template payload:', JSON.stringify(messagePayload));
 
     const response = await axios.post(
       `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`,
@@ -212,9 +212,10 @@ export async function sendWhatsAppTemplate(data: WhatsAppTemplateData) {
     console.log('[WhatsApp] Template send success:', response.data);
     return { success: true, data: response.data };
   } catch (error: any) {
-    console.error('[WhatsApp] Template sending failed:', error.response?.data || error.message);
-    if (error.response?.data?.error) {
-      const err = error.response.data.error;
+    const errorPayload = error.response?.data || error.message;
+    const err = error.response?.data?.error;
+    console.error('[WhatsApp] Template sending failed:', errorPayload);
+    if (err) {
       console.error('[WhatsApp] Error details:', {
         code: err.code,
         message: err.message,
@@ -223,7 +224,7 @@ export async function sendWhatsAppTemplate(data: WhatsAppTemplateData) {
         fbtrace_id: err.fbtrace_id
       });
     }
-    return { success: false, error: error.response?.data || error.message };
+    return { success: false, error: err?.message || error.message, rawError: err || errorPayload };
   }
 }
 
@@ -241,7 +242,12 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
     console.log('[WhatsApp] Preparing template send');
     console.log('[WhatsApp] Raw phone:', data.customerPhone);
     console.log('[WhatsApp] Formatted phone:', formattedPhone);
-    console.log('[WhatsApp] Template: purchase_receipt_1');
+    const templateName = process.env.WHATSAPP_TEMPLATE_NAME || 'purchase_receipt_1';
+    const primaryLanguage = process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en';
+    const fallbackLanguages = ['en_US', 'en_GB'];
+    const languagesToTry = Array.from(new Set([primaryLanguage, ...fallbackLanguages]));
+    console.log('[WhatsApp] Template:', templateName);
+    console.log('[WhatsApp] Languages to try:', languagesToTry);
     console.log('[WhatsApp] Parameters:', {
       name: data.customerName,
       orderId: data.orderId,
@@ -250,22 +256,39 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
       tier: data.tier
     });
 
-    // Send the approved template with order details
-    const templateResult = await sendWhatsAppTemplate({
-      to: formattedPhone,
-      templateName: 'purchase_receipt_1', // Approved Meta template name
-      languageCode: 'en_US',
-      parameters: [
-        { type: 'text', text: data.customerName },           // {{1}} Customer Name
-        { type: 'text', text: data.orderId },                // {{2}} Order ID
-        { type: 'text', text: data.orderTotal.toFixed(2) },  // {{3}} Total
-        { type: 'text', text: data.totalWeight.toString() }, // {{4}} Weight
-        { type: 'text', text: data.tier }                    // {{5}} Tier
-      ]
-    });
+    let lastResult: any = null;
+    for (const language of languagesToTry) {
+      console.log(`[WhatsApp] Attempting template send with language ${language}...`);
+      const attempt = await sendWhatsAppTemplate({
+        to: formattedPhone,
+        templateName,
+        languageCode: language,
+        parameters: [
+          { type: 'text', text: data.customerName },
+          { type: 'text', text: data.orderId },
+          { type: 'text', text: data.orderTotal.toFixed(2) },
+          { type: 'text', text: data.totalWeight.toString() },
+          { type: 'text', text: data.tier }
+        ]
+      });
 
-    console.log('[WhatsApp] Template result:', templateResult);
-    return templateResult;
+      console.log(`[WhatsApp] Result for language ${language}:`, attempt);
+      if (attempt.success) {
+        return attempt;
+      }
+
+      lastResult = attempt;
+      const errorCode = attempt.rawError?.code;
+      const errorMessage: string = attempt.rawError?.message || '';
+      const missingTranslation = errorCode === 132001 || /does not exist in/i.test(errorMessage);
+      if (!missingTranslation) {
+        console.log('[WhatsApp] Non-translation error encountered, stopping retries.');
+        break;
+      }
+    }
+
+    console.log('[WhatsApp] All template language attempts failed.');
+    return lastResult || { success: false, error: 'Template send failed with all languages' };
 
   } catch (error: any) {
     console.error('WhatsApp template sending failed:', error.response?.data || error.message);
