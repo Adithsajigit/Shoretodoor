@@ -242,10 +242,10 @@ export async function sendOrderInvoiceTemplate(data: WhatsAppMessageData) {
     console.log('[WhatsApp] Preparing template send');
     console.log('[WhatsApp] Raw phone:', data.customerPhone);
     console.log('[WhatsApp] Formatted phone:', formattedPhone);
-    const templateName = process.env.WHATSAPP_TEMPLATE_NAME || 'purchase_receipt_1';
-    const primaryLanguage = process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en';
-    const fallbackLanguages = ['en_US', 'en_GB'];
-    const languagesToTry = Array.from(new Set([primaryLanguage, ...fallbackLanguages]));
+  const templateName = process.env.WHATSAPP_TEMPLATE_NAME || 'purchase_receipt_1';
+  const primaryLanguage = process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en';
+  const fallbackLanguages = ['en_US', 'en_GB', 'en', 'en_IN'];
+  const languagesToTry = Array.from(new Set([primaryLanguage, ...fallbackLanguages]));
     console.log('[WhatsApp] Template:', templateName);
     console.log('[WhatsApp] Languages to try:', languagesToTry);
     console.log('[WhatsApp] Parameters:', {
